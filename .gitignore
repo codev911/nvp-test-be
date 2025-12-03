@@ -1,0 +1,57 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun.lockb
+
+# Build & output directories
+dist/
+
+# TypeScript cache & artifacts
+*.tsbuildinfo
+*.tsbuildinfo.backup
+
+# Environment variables
+.env
+.env.*        # e.g. .env.local, .env.production
+!.env.example # keep a safe example env file for reference
+
+# Logs
+logs/
+*.log
+*.log.*
+lerna-debug.log
+
+# Test / Coverage
+coverage/
+jest-test-results.json
+
+# Editor / IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System junk
+.DS_Store
+Thumbs.db
+
+# Biome cache
+.biome-cache/
+.biome.json.tmp
+.biome.lock
+
+# Misc build caches
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+*.tgz
+
+# lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
