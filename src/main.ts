@@ -2,10 +2,10 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
-import { CORS_ORIGIN, PORT } from './configs/env.config';
 import { errorHandler, notFoundHandler } from './middlewares/error-handler.middleware';
 import { responseInterceptor } from './middlewares/response-interceptor.middleware';
 import router from './routes/index.route';
+import { CORS_ORIGIN, PORT } from './utils/configs/env.config';
 import logger from './utils/log.util';
 
 const app: Express = express();

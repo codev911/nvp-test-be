@@ -1,7 +1,7 @@
 import type { LogLevel as BunyanLogLevel } from 'bunyan';
 import bunyan from 'bunyan';
 import chalk from 'chalk';
-import { LOG_LEVEL } from '../configs/env.config';
+import { LOG_LEVEL } from './configs/env.config';
 
 function getLogLevel(): BunyanLogLevel {
   return LOG_LEVEL as BunyanLogLevel;

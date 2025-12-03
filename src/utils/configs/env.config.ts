@@ -7,7 +7,7 @@ import {
   DEFAULT_LOG_LEVEL,
   DEFAULT_MONGO_URI,
   DEFAULT_PORT,
-} from '../utils/consts/static.const';
+} from '../consts/static.const';
 
 // Load environment variables
 config({ debug: false, quiet: true, override: false });
