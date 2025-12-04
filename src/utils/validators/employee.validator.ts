@@ -1,4 +1,19 @@
 import { z } from 'zod';
+import { SortSelection } from '../../utils/enums/sort-selection.enum';
+import { SortType } from '../../utils/enums/sort-type.enum';
+import { DEFAULT_PAGE_NUMBER, DEFAULT_PAGE_SIZE } from '../consts/static.const';
+
+export const filterEmployeeValidator = z.object({
+  page: z.number().min(1, 'Minimum value is 1').default(DEFAULT_PAGE_NUMBER).optional(),
+  limit: z
+    .number()
+    .min(1, 'Minimum value is 1')
+    .max(100, 'Maximum value is 100')
+    .default(DEFAULT_PAGE_SIZE)
+    .optional(),
+  sort: z.enum(SortSelection).default(SortSelection.NAME).optional(),
+  sorttype: z.enum(SortType).default(SortType.ASC).optional(),
+});
 
 export const addEmployeeValidator = z
   .array(

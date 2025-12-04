@@ -1,13 +1,21 @@
 import Busboy from 'busboy';
 import csv from 'csv-parser';
 import type { Request, Response } from 'express';
-import { addEmployees, deleteEmployees, updateEmployees } from '../services/employee.service';
+import {
+  addEmployees,
+  deleteEmployees,
+  getDataEmployee,
+  updateEmployees,
+} from '../services/employee.service';
 import { DEFAULT_BATCH_SIZE } from '../utils/consts/static.const';
+import type { SortSelection } from '../utils/enums/sort-selection.enum';
+import type { SortType } from '../utils/enums/sort-type.enum';
 import type { IResponse } from '../utils/interfaces/response.interface';
 import type { IEmployeeCreate } from '../utils/interfaces/schemas/employee-schema.interface';
 import {
   addEmployeeValidator,
   deleteEmployeeValidator,
+  filterEmployeeValidator,
   updateEmployeeValidator,
 } from '../utils/validators/employee.validator';
 
@@ -134,4 +142,40 @@ export async function remove(req: Request, res: Response) {
   };
 
   return res.status(200).json(response);
+}
+
+export async function getDataEmp(req: Request, res: Response) {
+  const { page, limit, sort, sorttype } = req.query;
+  const response: IResponse = {
+    message: 'Successfully get employee data.',
+    data: null,
+    pagination: {},
+  };
+  const data = {
+    page: page ? parseInt(page as unknown as string, 10) : undefined,
+    limit: limit ? parseInt(limit as unknown as string, 10) : undefined,
+    sort: sort ? (sort as unknown as SortSelection) : undefined,
+    sorttype: sorttype ? (sorttype as unknown as SortType) : undefined,
+  };
+
+  try {
+    filterEmployeeValidator.parse({ ...data });
+  } catch (error: unknown) {
+    const errorMessages =
+      error instanceof Error ? JSON.parse(error.message) : [{ message: 'Invalid request body' }];
+    response.message = errorMessages.map((err: { message: string }) => err.message).join(', ');
+
+    return res.status(400).json(response);
+  }
+
+  const getData = await getDataEmployee(data.page, data.limit, data.sort, data.sorttype);
+  response.data = getData.result;
+  response.pagination = {
+    limit: getData.pagination.limit,
+    page: getData.pagination.page,
+    total_page: getData.pagination.total_page,
+    total_data: getData.pagination.total_data,
+  };
+
+  res.status(200).json(response);
 }
