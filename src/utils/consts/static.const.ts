@@ -9,6 +9,7 @@ export const DEFAULT_MONGO_URI: string = 'mongodb://localhost:27017';
 export const DEFAULT_MONGO_DB_NAME: string = 'employee-management';
 export const DEFAULT_REDIS_HOST: string = 'localhost';
 export const DEFAULT_REDIS_PORT: string = '6379';
+export const DEFAULT_BATCH_SIZE: number = 10;
 
 // Pagination defaults
 export const DEFAULT_PAGE_SIZE: number = 10;
