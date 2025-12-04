@@ -28,16 +28,19 @@ const employeeWorker = new Worker(
         break;
       case QueueActionEnum.UPDATE:
         logger.info(`Processing job ID: ${job.id} - Update employee ${id}`);
-        await employee.findByIdAndUpdate(id, {
-          ...(name && { name }),
-          ...(age && { age }),
-          ...(position && { position }),
-          ...(salary && { salary }),
-        });
+        await employee.findOneAndUpdate(
+          { id: id },
+          {
+            ...(name && { name }),
+            ...(age && { age }),
+            ...(position && { position }),
+            ...(salary && { salary }),
+          },
+        );
         break;
       case QueueActionEnum.DELETE:
         logger.info(`Processing job ID: ${job.id} - Delete employee ${id}`);
-        await employee.findByIdAndDelete(id);
+        await employee.findOneAndDelete({ id: id });
         break;
     }
   },
