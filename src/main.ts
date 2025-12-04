@@ -2,44 +2,57 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
+import { connectToDatabase } from './database/mongo.database';
 import { errorHandler, notFoundHandler } from './middlewares/error-handler.middleware';
 import { responseInterceptor } from './middlewares/response-interceptor.middleware';
 import router from './routes/index.route';
 import { CORS_ORIGIN, PORT } from './utils/configs/env.config';
 import logger from './utils/log.util';
 
-const app: Express = express();
+async function main(): Promise<Express> {
+  const app: Express = express();
 
-// Security middlewares - should be first
-app.use(helmet());
-app.use(
-  cors({
-    origin: CORS_ORIGIN,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  }),
-);
+  // Security middlewares - should be first
+  app.use(helmet());
+  app.use(
+    cors({
+      origin: CORS_ORIGIN,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    }),
+  );
 
-// Body parsing middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+  // Body parsing middleware
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
 
-// Global response interceptor
-app.use(responseInterceptor);
+  // Global response interceptor
+  app.use(responseInterceptor);
 
-// Routes
-app.use('/', router);
+  // Connect to MongoDB
+  await connectToDatabase();
 
-// 404 Handler - must be after all routes
-app.use(notFoundHandler);
+  // Routes
+  app.use('/', router);
 
-// Global Error Handler - must be last
-app.use(errorHandler);
+  // 404 Handler - must be after all routes
+  app.use(notFoundHandler);
+
+  // Global Error Handler - must be last
+  app.use(errorHandler);
+
+  return app;
+}
 
 // Start server
-app.listen(PORT, () => {
-  logger.info(`Backend server started successfully at http://localhost:${PORT}`);
-});
-
-export default app;
+main()
+  .then((app: Express) => {
+    app.listen(PORT, () => {
+      logger.info(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    logger.error('Failed to start the server.', { error });
+    process.exit(1);
+  });
