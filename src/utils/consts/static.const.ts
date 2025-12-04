@@ -7,9 +7,19 @@ export const DEFAULT_JWT_SECRET: string = 'your-secret-key';
 export const DEFAULT_JWT_EXPIRES_IN: string = '1d';
 export const DEFAULT_MONGO_URI: string = 'mongodb://localhost:27017';
 export const DEFAULT_MONGO_DB_NAME: string = 'employee-management';
+export const DEFAULT_REDIS_HOST: string = 'localhost';
+export const DEFAULT_REDIS_PORT: string = '6379';
+
+// Pagination defaults
 export const DEFAULT_PAGE_SIZE: number = 10;
 export const DEFAULT_MAX_PAGE_SIZE: number = 100;
 export const DEFAULT_PAGE_NUMBER: number = 1;
+
+// Employee Queue constants
+export const EMPLOYEE_QUEUE_NAME: string = 'employeeQueue';
+export const EMPLOYEE_QUEUE_JOB_NAME: string = 'employeeJob';
+export const EMPLOYEE_QUEUE_CONCURRENCY: number = 10;
+export const EMPLOYEE_QUEUE_AUTORUN: boolean = true;
 
 // HTTP Error Status Codes
 export const HTTP_ERROR_STATUS: Record<number, string> = {
