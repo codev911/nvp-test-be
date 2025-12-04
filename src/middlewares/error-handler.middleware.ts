@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import { HTTP_ERROR_STATUS } from '../utils/consts/static.const';
 import { ResponseStatus } from '../utils/enums/response-status.enum';
 import type { IErrorResponse } from '../utils/interfaces/error-response.interface';
 import logger from '../utils/log.util';
@@ -52,7 +53,7 @@ export function errorHandler(
   // Build error response using IErrorResponse structure
   const errorResponse: IErrorResponse = {
     status: ResponseStatus.ERROR,
-    message: err.message || getDefaultErrorMessage(statusCode),
+    message: err.message || HTTP_ERROR_STATUS[statusCode] || 'Internal Server Error',
     code: statusCode,
   };
 
@@ -90,26 +91,4 @@ export function notFoundHandler(req: Request, res: Response, _next: NextFunction
   };
 
   res.status(404).json(errorResponse);
-}
-
-/**
- * Get default error message based on HTTP status code
- */
-function getDefaultErrorMessage(statusCode: number): string {
-  const errorMessages: Record<number, string> = {
-    400: 'Bad Request',
-    401: 'Unauthorized',
-    403: 'Forbidden',
-    404: 'Not Found',
-    405: 'Method Not Allowed',
-    409: 'Conflict',
-    422: 'Unprocessable Entity',
-    429: 'Too Many Requests',
-    500: 'Internal Server Error',
-    502: 'Bad Gateway',
-    503: 'Service Unavailable',
-    504: 'Gateway Timeout',
-  };
-
-  return errorMessages[statusCode] || 'Internal Server Error';
 }

@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import { HTTP_ERROR_STATUS } from '../utils/consts/static.const';
 import { ResponseStatus } from '../utils/enums/response-status.enum';
 import type { IErrorResponse } from '../utils/interfaces/error-response.interface';
 import type { IResponse } from '../utils/interfaces/response.interface';
@@ -24,7 +25,7 @@ export function responseInterceptor(_req: Request, res: Response, next: NextFunc
         if ('message' in data && typeof data.message === 'string') {
           errorResponse.message = data.message;
         } else {
-          errorResponse.message = getDefaultErrorMessage(res.statusCode);
+          errorResponse.message = HTTP_ERROR_STATUS[res.statusCode] || 'Error';
         }
 
         // Extract cause if present
@@ -43,7 +44,7 @@ export function responseInterceptor(_req: Request, res: Response, next: NextFunc
         }
       } else {
         // If data is not an object, use default error message
-        errorResponse.message = getDefaultErrorMessage(res.statusCode);
+        errorResponse.message = HTTP_ERROR_STATUS[res.statusCode] || 'Error';
       }
 
       return originalJson(errorResponse);
@@ -101,26 +102,4 @@ export function responseInterceptor(_req: Request, res: Response, next: NextFunc
   };
 
   next();
-}
-
-/**
- * Get default error message based on HTTP status code
- */
-function getDefaultErrorMessage(statusCode: number): string {
-  const errorMessages: Record<number, string> = {
-    400: 'Bad Request',
-    401: 'Unauthorized',
-    403: 'Forbidden',
-    404: 'Not Found',
-    405: 'Method Not Allowed',
-    409: 'Conflict',
-    422: 'Unprocessable Entity',
-    429: 'Too Many Requests',
-    500: 'Internal Server Error',
-    502: 'Bad Gateway',
-    503: 'Service Unavailable',
-    504: 'Gateway Timeout',
-  };
-
-  return errorMessages[statusCode] || 'Error';
 }
