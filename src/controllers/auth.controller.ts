@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { adminAuthenticate } from '../services/auth.service';
 import type { IResponse } from '../utils/interfaces/response.interface';
+import { loginValidator } from '../utils/validators/auth.validator';
 
 export async function authAdmin(req: Request, res: Response) {
   const { email, password } = req.body;
@@ -8,8 +9,13 @@ export async function authAdmin(req: Request, res: Response) {
     message: '',
   };
 
-  if (!(email && password)) {
-    response.message = 'email and password are required for authentication.';
+  try {
+    loginValidator.parse({ email, password });
+  } catch (error: unknown) {
+    const errorMessages =
+      error instanceof Error ? JSON.parse(error.message) : [{ message: 'Invalid request body' }];
+    response.message = errorMessages.map((err: { message: string }) => err.message).join(', ');
+
     return res.status(400).json(response);
   }
 
