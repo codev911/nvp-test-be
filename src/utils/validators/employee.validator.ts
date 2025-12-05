@@ -13,6 +13,7 @@ export const filterEmployeeValidator = z.object({
     .optional(),
   sort: z.enum(SortSelection).default(SortSelection.NAME).optional(),
   sorttype: z.enum(SortType).default(SortType.ASC).optional(),
+  search: z.string().optional(),
 });
 
 export const addEmployeeValidator = z
@@ -20,7 +21,7 @@ export const addEmployeeValidator = z
     z.object({
       name: z.string().min(1, 'Name is required'),
       position: z.string().min(1, 'Position is required'),
-      department: z.string().min(1, 'Department is required'),
+      age: z.number().int().positive('Age must be positive'),
       salary: z.number().positive('Salary must be a positive number'),
     }),
   )
@@ -32,7 +33,7 @@ export const updateEmployeeValidator = z
       id: z.string().min(1, 'Employee ID is required'),
       name: z.string().min(1, 'Name is required').optional(),
       position: z.string().min(1, 'Position is required').optional(),
-      department: z.string().min(1, 'Department is required').optional(),
+      age: z.number().int().positive('Age must be positive').optional(),
       salary: z.number().positive('Salary must be a positive number').optional(),
     }),
   )

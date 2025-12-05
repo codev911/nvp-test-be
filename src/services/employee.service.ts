@@ -1,3 +1,4 @@
+import type { FilterQuery } from 'mongoose';
 import { employee } from '../database/schemas/employee.schema';
 import { addEmployeeJob } from '../queues/employee.queue';
 import {
@@ -10,6 +11,7 @@ import { SortSelection } from '../utils/enums/sort-selection.enum';
 import { SortType } from '../utils/enums/sort-type.enum';
 import type {
   IEmployeeCreate,
+  IEmployeeSchema,
   IEmployeeUpdate,
 } from '../utils/interfaces/schemas/employee-schema.interface';
 
@@ -18,18 +20,30 @@ export async function getDataEmployee(
   limit: number = DEFAULT_PAGE_SIZE,
   sort: SortSelection = SortSelection.NAME,
   sorttype: SortType = SortType.ASC,
+  search?: string,
 ) {
   if (limit > DEFAULT_MAX_PAGE_SIZE) {
     throw new Error(`Max page limit is ${DEFAULT_MAX_PAGE_SIZE}`);
   }
 
+  const filter: FilterQuery<IEmployeeSchema> = {};
+  if (search && search.trim().length > 0) {
+    const regex = new RegExp(search, 'i');
+    const numeric = Number(search);
+    filter.$or = [
+      { name: regex },
+      { position: regex },
+      ...(Number.isNaN(numeric) ? [] : [{ age: numeric }]),
+    ];
+  }
+
   const result = await Promise.all([
     employee
-      .find()
+      .find(filter)
       .skip((page - 1) * limit)
       .limit(limit)
       .sort([[sort, sorttype]]),
-    employee.countDocuments(),
+    employee.countDocuments(filter),
   ]);
   const mod = result[1] % limit;
 

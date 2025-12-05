@@ -1,3 +1,4 @@
+import http from 'node:http';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express, { type Express } from 'express';
@@ -8,6 +9,7 @@ import { responseInterceptor } from './middlewares/response-interceptor.middlewa
 import router from './routes/index.route';
 import { CORS_ORIGIN, PORT } from './utils/configs/env.config';
 import logger from './utils/log.util';
+import { initNotificationWebsocket } from './websocket/notification.websocket';
 
 async function main(): Promise<Express> {
   const app: Express = express();
@@ -48,7 +50,9 @@ async function main(): Promise<Express> {
 // Start server
 main()
   .then((app: Express) => {
-    app.listen(PORT, () => {
+    const server = http.createServer(app);
+    initNotificationWebsocket(server);
+    server.listen(PORT, () => {
       logger.info(`Server is running on http://localhost:${PORT}`);
     });
   })

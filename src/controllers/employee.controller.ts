@@ -7,6 +7,7 @@ import {
   getDataEmployee,
   updateEmployees,
 } from '../services/employee.service';
+import { createNotification } from '../services/notification.service';
 import { DEFAULT_BATCH_SIZE } from '../utils/consts/static.const';
 import type { SortSelection } from '../utils/enums/sort-selection.enum';
 import type { SortType } from '../utils/enums/sort-type.enum';
@@ -31,7 +32,14 @@ export function addFromCSV(req: Request, res: Response) {
     csvStream.on('data', async (rawRow: IEmployeeCreate) => {
       csvStream.pause();
 
-      batch.push(rawRow);
+      const parsedRow: IEmployeeCreate = {
+        name: rawRow.name,
+        position: rawRow.position,
+        salary: Number(rawRow.salary),
+        age: Number(rawRow.age),
+      };
+
+      batch.push(parsedRow);
 
       if (batch.length >= DEFAULT_BATCH_SIZE) {
         const currentBatch = batch;
@@ -56,6 +64,11 @@ export function addFromCSV(req: Request, res: Response) {
           total_queued: totalQueuedRows,
         },
       };
+
+      await createNotification(
+        'CSV import',
+        `Import CSV ${totalQueuedRows} baris sedang diproses.`,
+      );
 
       res.status(200).json(response);
     });
@@ -92,6 +105,10 @@ export async function add(req: Request, res: Response) {
   response.data = {
     total_queued: req.body.length,
   };
+  await createNotification(
+    'Employee queued',
+    `Menambahkan ${req.body.length} data karyawan ke antrean.`,
+  );
 
   return res.status(200).json(response);
 }
@@ -116,6 +133,7 @@ export async function update(req: Request, res: Response) {
   response.data = {
     total_queued: req.body.length,
   };
+  await createNotification('Employee update', `Memperbarui ${req.body.length} data karyawan.`);
 
   return res.status(200).json(response);
 }
@@ -140,12 +158,13 @@ export async function remove(req: Request, res: Response) {
   response.data = {
     total_queued: req.body.length,
   };
+  await createNotification('Employee delete', `Menghapus ${req.body.length} data karyawan.`);
 
   return res.status(200).json(response);
 }
 
 export async function getDataEmp(req: Request, res: Response) {
-  const { page, limit, sort, sorttype } = req.query;
+  const { page, limit, sort, sorttype, search } = req.query;
   const response: IResponse = {
     message: 'Successfully get employee data.',
     data: null,
@@ -156,6 +175,7 @@ export async function getDataEmp(req: Request, res: Response) {
     limit: limit ? parseInt(limit as unknown as string, 10) : undefined,
     sort: sort ? (sort as unknown as SortSelection) : undefined,
     sorttype: sorttype ? (sorttype as unknown as SortType) : undefined,
+    search: search ? (search as unknown as string) : undefined,
   };
 
   try {
@@ -168,7 +188,13 @@ export async function getDataEmp(req: Request, res: Response) {
     return res.status(400).json(response);
   }
 
-  const getData = await getDataEmployee(data.page, data.limit, data.sort, data.sorttype);
+  const getData = await getDataEmployee(
+    data.page,
+    data.limit,
+    data.sort,
+    data.sorttype,
+    data.search,
+  );
   response.data = getData.result;
   response.pagination = {
     limit: getData.pagination.limit,
