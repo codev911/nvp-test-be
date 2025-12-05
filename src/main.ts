@@ -8,6 +8,7 @@ import { errorHandler, notFoundHandler } from './middlewares/error-handler.middl
 import { responseInterceptor } from './middlewares/response-interceptor.middleware';
 import router from './routes/index.route';
 import { CORS_ORIGIN, PORT } from './utils/configs/env.config';
+import { setupSwagger } from './utils/configs/swagger.config';
 import logger from './utils/log.util';
 import { initNotificationWebsocket } from './websocket/notification.websocket';
 
@@ -28,6 +29,9 @@ async function main(): Promise<Express> {
   // Body parsing middleware
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
+
+  // API documentation
+  setupSwagger(app);
 
   // Global response interceptor
   app.use(responseInterceptor);

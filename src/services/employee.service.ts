@@ -10,7 +10,6 @@ import { SortSelection } from '../utils/enums/sort-selection.enum';
 import { SortType } from '../utils/enums/sort-type.enum';
 import type {
   IEmployeeCreate,
-  IEmployeeSchema,
   IEmployeeUpdate,
 } from '../utils/interfaces/schemas/employee-schema.interface';
 
