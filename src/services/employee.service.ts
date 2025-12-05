@@ -1,4 +1,3 @@
-import type { FilterQuery } from 'mongoose';
 import { employee } from '../database/schemas/employee.schema';
 import { addEmployeeJob } from '../queues/employee.queue';
 import {
@@ -26,7 +25,7 @@ export async function getDataEmployee(
     throw new Error(`Max page limit is ${DEFAULT_MAX_PAGE_SIZE}`);
   }
 
-  const filter: FilterQuery<IEmployeeSchema> = {};
+  const filter: Record<string, unknown> = {};
   if (search && search.trim().length > 0) {
     const regex = new RegExp(search, 'i');
     const numeric = Number(search);
